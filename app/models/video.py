@@ -6,6 +6,8 @@ class Video(db.Model):
     release_date = db.Column(db.DateTime, nullable=False)
     total_inventory = db.Column(db.Integer, nullable=False)
 
+    customers = db.relationship("Customer", secondary="rentals")
+
     def video_dict(self):
         return {
             "id": self.id,
