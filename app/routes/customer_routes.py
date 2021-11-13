@@ -2,7 +2,7 @@ from app import db
 from flask import Blueprint, jsonify, request
 from app.models.customer import Customer
 
-customer_bp = Blueprint("", __name__, url_prefix="/customers")
+customers_bp = Blueprint("customers", __name__, url_prefix="/customers")
 
 
 def invalid_data(request_body):
@@ -27,7 +27,7 @@ def invalid_customer(customer_id):
     return invalid
 
 
-@customer_bp.route("", methods=["POST"])
+@customers_bp.route("", methods=["POST"])
 def post_customer():
     request_body = request.get_json()
     invalid_response = invalid_data(request_body)
@@ -43,14 +43,14 @@ def post_customer():
     return jsonify(invalid_response), 400
 
 
-@customer_bp.route("", methods=["GET"])
+@customers_bp.route("", methods=["GET"])
 def get_customers():
     customers = Customer.query.all()
     customer_list = [customer.to_json() for customer in customers]
     return jsonify(customer_list), 200
 
 
-@customer_bp.route("/<customer_id>", methods=["GET"])
+@customers_bp.route("/<customer_id>", methods=["GET"])
 def get_one_customer(customer_id):
     invalid_response = invalid_customer(customer_id)
     if invalid_response:
@@ -59,7 +59,7 @@ def get_one_customer(customer_id):
     return jsonify(one_customer.to_json()), 200
 
 
-@customer_bp.route("/<customer_id>", methods=["PUT"])
+@customers_bp.route("/<customer_id>", methods=["PUT"])
 def update_customer(customer_id):
     one_customer = Customer.query.get(customer_id)
     invalid_cust = invalid_customer(customer_id)
@@ -76,7 +76,7 @@ def update_customer(customer_id):
     return jsonify(one_customer.to_json()), 200
 
 
-@customer_bp.route("/<customer_id>", methods=["DELETE"])
+@customers_bp.route("/<customer_id>", methods=["DELETE"])
 def delete_customer(customer_id):
     one_customer = Customer.query.get(customer_id)
     invalid_cust = invalid_customer(customer_id)
