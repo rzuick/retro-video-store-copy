@@ -8,7 +8,7 @@ class Customer(db.Model):
     phone = db.Column(db.String)
     register_at = db.Column(db.DateTime)
 
-    videos = db.relationship("Video", secondary="rentals", backref="checked_out_to")
+    videos = db.relationship("Video", secondary="rentals", backref="checked_out")
 
     def to_json(self):
         return {
