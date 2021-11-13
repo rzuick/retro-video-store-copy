@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from app.models.rental import Rental
 from app.models.customer import Customer
 from app.models.video import Video
+from datetime import timedelta, datetime
 
 rentals_bp = Blueprint("rentals", __name__, url_prefix="/rentals")
 
@@ -28,17 +29,28 @@ def post_rental():
         return jsonify({"Bad Request": f"Video not found."}), 404
     elif one_customer is None:
         return jsonify({"Bad Request": f"Customer not found."}), 404
-
+    video_current_checked_out = Rental.query.filter_by(checked_out=True, video_id=one_video.id).count()
+    available_inventory = one_video.total_inventory - video_current_checked_out
+    if available_inventory == 0:
+        return jsonify({"message": "Could not perform checkout"}), 400
     new_rental = Rental(
         customer_id=one_customer.id,
-        video_id = one_video.id
+        video_id = one_video.id,
+        due_date = (datetime.now(tz=None) + timedelta(days=7)),
+        checked_out = True
     )
     db.session.add(new_rental)
     db.session.commit()
-    all_rentals = Rental.query.all()
-    if len(all_rentals) > one_video.total_inventory:
-        return jsonify({"message": "Could not perform checkout"}), 400
-    return jsonify(new_rental.to_json()), 200
+    cust_current_checked_out = Rental.query.filter_by(customer_id=one_customer.id, checked_out=True).count()
+    available_inventory -=1
+    response_body = {
+        "customer_id": one_customer.id,
+            "video_id": one_video.id,
+            "due_date": new_rental.due_date,
+            "videos_checked_out_count": cust_current_checked_out,
+            "available_inventory": available_inventory
+    }
+    return jsonify(response_body), 200
 
 @rentals_bp.route("/check-in", methods=["POST"])
 def post_rental_return():
@@ -53,14 +65,23 @@ def post_rental_return():
         return jsonify({"Bad Request": f"Video not found."}), 404
     elif one_customer is None:
         return jsonify({"Bad Request": f"Customer not found."}), 404
+    video_current_checked_in = Rental.query.filter_by(checked_out=True).count()
+    video_checked_out = Rental.query.filter_by(checked_out=False).count()
+    if video_current_checked_in == 0:
+        return jsonify({"message": f"No outstanding rentals for customer {one_customer.id} and video {one_video.id}"}), 400
     returned_rental = Rental(
         customer_id = one_customer.id,
-        video_id = one_video.id
+        video_id = one_video.id,
+        checked_out = False
     )
     db.session.add(returned_rental)
     db.session.commit()
-    all_rentals = Rental.query.all()
-    if len(all_rentals) == one_video.total_inventory:
-        return jsonify({"message": f"No outstanding rentals for customer {one_customer.id} and video {one_video.id}"}), 400
-    return jsonify(returned_rental.to_json_returned()), 200
+    available_inventory = one_video.total_inventory - video_checked_out
+    response_body = {
+        "customer_id": one_customer.id,
+        "video_id": one_video.id,
+        "videos_checked_out_count": video_checked_out,
+        "available_inventory": available_inventory
+            }
+    return jsonify(response_body), 200
 
