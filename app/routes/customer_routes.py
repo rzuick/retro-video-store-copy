@@ -59,14 +59,16 @@ def get_one_customer(customer_id):
     one_customer = Customer.query.get(customer_id)
     return jsonify(one_customer.to_json()), 200
 
-# still working on this endpoint.
 @customers_bp.route("/<customer_id>/rentals", methods=["GET"])
 def get_cust_rental(customer_id):
     if Customer.query.get(customer_id) is None:
         return jsonify({"message": f"Customer {customer_id} was not found"}), 404
-    # customer_rentals = Rental.query.get(customer_id)
-    # print(customer_rentals)
-    # return jsonify(customer_rentals.rental_by_title()), 200
+    all_rentals = Rental.query.filter_by(customer_id = customer_id) # get rental by cust_id
+    response = []
+    for rental in all_rentals: # to access formatted rental information
+        response.append(rental.rental_by_title())
+    return jsonify(response), 200
+
 
 
 @customers_bp.route("/<customer_id>", methods=["PUT"])
