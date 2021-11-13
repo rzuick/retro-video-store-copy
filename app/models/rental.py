@@ -36,4 +36,8 @@ class Rental(db.Model):
             "videos_checked_out_count": self.videos_checked_out,
             "available_inventory": video.total_inventory
             }
-
+    def rental_by_title(self):
+        video = Video.query.get(self.video_id)
+        return{
+            "title": video.title
+        }

@@ -3,7 +3,6 @@ from flask import Blueprint, jsonify, request
 from app.models.rental import Rental
 from app.models.customer import Customer
 from app.models.video import Video
-from datetime import datetime, timedelta
 
 rentals_bp = Blueprint("rentals", __name__, url_prefix="/rentals")
 
@@ -64,3 +63,4 @@ def post_rental_return():
     if len(all_rentals) == one_video.total_inventory:
         return jsonify({"message": f"No outstanding rentals for customer {one_customer.id} and video {one_video.id}"}), 400
     return jsonify(returned_rental.to_json_returned()), 200
+
