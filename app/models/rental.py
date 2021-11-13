@@ -1,6 +1,7 @@
 from sqlalchemy.orm import backref
 from app import db
 from app.models.video import Video
+from app.models.customer import Customer
 from datetime import datetime, timedelta
 
 class Rental(db.Model):
@@ -40,4 +41,10 @@ class Rental(db.Model):
         video = Video.query.get(self.video_id)
         return{
             "title": video.title
+        }
+
+    def cust_by_name(self):
+        customer = Customer.query.get(self.customer_id)
+        return {
+            "name": customer.name
         }

@@ -70,7 +70,6 @@ def get_cust_rental(customer_id):
     return jsonify(response), 200
 
 
-
 @customers_bp.route("/<customer_id>", methods=["PUT"])
 def update_customer(customer_id):
     one_customer = Customer.query.get(customer_id)
