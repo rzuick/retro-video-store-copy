@@ -18,11 +18,22 @@ class Rental(db.Model):
         current_day = datetime.now(tz=None)
         checkout = timedelta(days=7)
         due = current_day + checkout
+        self.checked_out = True
         return {
             "customer_id": self.customer_id,
             "video_id": self.video_id,
             "due_date": due,
             "videos_checked_out_count": self.videos_checked_out +1,
             "available_inventory": video.total_inventory - 1
+            }
+
+    def to_json_returned(self):
+        video = Video.query.get(self.video_id)
+        self.checked_out = False
+        return {
+            "customer_id": self.customer_id,
+            "video_id": self.video_id,
+            "videos_checked_out_count": self.videos_checked_out,
+            "available_inventory": video.total_inventory
             }
 
