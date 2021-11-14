@@ -1,4 +1,3 @@
-from sqlalchemy.orm import backref
 from app import db
 from app.models.video import Video
 from app.models.customer import Customer
@@ -23,3 +22,6 @@ class Rental(db.Model):
         return {
             "name": customer.name
         }
+
+    def rental_json(self):
+        pass
