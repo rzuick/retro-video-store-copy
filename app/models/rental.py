@@ -11,6 +11,9 @@ class Rental(db.Model):
     due_date = db.Column(db.DateTime)
     checked_out = db.Column(db.Boolean, default = False)
 
+    def due_date_calc(self):
+        return (datetime.now(tz=None) + timedelta(days=7))
+
     def rental_by_title(self):
         video = Video.query.get(self.video_id)
         return{
@@ -22,6 +25,3 @@ class Rental(db.Model):
         return {
             "name": customer.name
         }
-
-    def rental_json(self):
-        pass

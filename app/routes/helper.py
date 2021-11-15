@@ -4,15 +4,14 @@ from app.models.rental import Rental
 from app.models.customer import Customer
 
 def invalid_cust_data(request_body):
+    invalid = False
     if "name" not in request_body:
-        valid = {"details": "Request body must include name."}
+        invalid = {"details": "Request body must include name."}
     elif "phone" not in request_body:
-        valid = {"details": "Request body must include phone."}
+        invalid = {"details": "Request body must include phone."}
     elif "postal_code" not in request_body:
-        valid = {"details": "Request body must include postal_code."}
-    else:
-        valid = False
-    return valid
+        invalid = {"details": "Request body must include postal_code."}
+    return invalid
     
 def invalid_customer(customer_id):
     invalid = False
